@@ -22,16 +22,16 @@ var d3Flow = (function() {
         this.addNode = function(s, w, h, t) {
             var node = new Node(this.chart, s, w, h, t)
             this.nodes.push(node);
-            return node.node;
+            return node;
         };
 
         this.addConn = function(node1, node2, t) {
             
-            var dims1 = node1.node().getBBox();
-            var dims2 = node2.node().getBBox();
+            var dims1 = node1.node.node().getBBox();
+            var dims2 = node2.node.node().getBBox();
 
-            var tran1 = getTranslation(node1.attr("transform"));
-            var tran2 = getTranslation(node2.attr("transform"));
+            var tran1 = getTranslation(node1.node.attr("transform"));
+            var tran2 = getTranslation(node2.node.attr("transform"));
 
             var diffs = {
                 right : (tran2.x) - (tran1.x + dims1.width),
@@ -68,7 +68,7 @@ var d3Flow = (function() {
 
             var conn = new Connection(this.chart, x1, y1, x2, y2, t);
             this.connections.push(conn);
-            return conn.conn;
+            return conn;
         };
 
     };
@@ -92,6 +92,18 @@ var d3Flow = (function() {
             .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
             .style("text-anchor","middle")
             .style("dominant-baseline", "middle");
+
+        this.loc = function(x, y) {
+            this.node.attr("transform", "translate(" + x + "," + y + ")");
+            return this;
+        }
+
+        this.rel = function(node, dx, dy) {
+            //var dims = node.node.node().getBBox();
+            var tran = getTranslation(node.node.attr("transform"));
+            this.node.attr("transform", "translate(" + (tran.x + dx) + "," + (tran.y + dy) + ")");
+            return this;
+        }
     };
 
     // connection class
