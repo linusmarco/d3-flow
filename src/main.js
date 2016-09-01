@@ -26,47 +26,7 @@ var d3Flow = (function() {
         };
 
         this.addConn = function(node1, node2, t) {
-            
-            var dims1 = node1.node.node().getBBox();
-            var dims2 = node2.node.node().getBBox();
-
-            var tran1 = getTranslation(node1.node.attr("transform"));
-            var tran2 = getTranslation(node2.node.attr("transform"));
-
-            var diffs = {
-                right : (tran2.x) - (tran1.x + dims1.width),
-                left : (tran1.x) - (tran2.x + dims2.width),
-                top : (tran1.y) - (tran2.y + dims2.height),
-                bottom : (tran2.y) - (tran1.y + dims1.height)
-            };
-
-            var x1, y1, x2, y2;
-            if (Math.max(diffs.right, diffs.left, diffs.top, diffs.bottom) === diffs.right) {
-                x1 = tran1.x + dims1.width;
-                y1 = tran1.y + dims1.height / 2;
-                x2 = tran2.x;
-                y2 = tran2.y + dims2.height / 2;
-            }
-            else if (Math.max(diffs.right, diffs.left, diffs.top, diffs.bottom) === diffs.left) {
-                x1 = tran1.x;
-                y1 = tran1.y + dims1.height / 2;
-                x2 = tran2.x + dims2.width;
-                y2 = tran2.y + dims1.height / 2;    
-            }
-            else if (Math.max(diffs.right, diffs.left, diffs.top, diffs.bottom) === diffs.top) {
-                x1 = tran1.x + dims1.width / 2;
-                y1 = tran1.y;
-                x2 = tran2.x + dims2.width / 2;
-                y2 = tran2.y + dims2.height;   
-            }
-            else {
-                x1 = tran1.x + dims1.width / 2;
-                y1 = tran1.y + dims1.height;
-                x2 = tran2.x + dims2.width / 2;
-                y2 = tran2.y;   
-            }
-
-            var conn = new Connection(this.chart, x1, y1, x2, y2, t);
+            var conn = new Connection(this.chart, node1, node2, t);
             this.connections.push(conn);
             return conn;
         };
@@ -96,18 +56,61 @@ var d3Flow = (function() {
         this.loc = function(x, y) {
             this.node.attr("transform", "translate(" + x + "," + y + ")");
             return this;
-        }
+        };
 
         this.rel = function(node, dx, dy) {
             //var dims = node.node.node().getBBox();
             var tran = getTranslation(node.node.attr("transform"));
             this.node.attr("transform", "translate(" + (tran.x + dx) + "," + (tran.y + dy) + ")");
             return this;
-        }
+        };
     };
 
     // connection class
-    var Connection = function(chart, x1, y1, x2, y2, t) {
+    var Connection = function(chart, node1, node2, t) {
+        
+        this.node1 = node1;
+        this.node2 = node2;
+
+        var dims1 = this.node1.node.node().getBBox();
+        var dims2 = this.node2.node.node().getBBox();
+
+        var tran1 = getTranslation(node1.node.attr("transform"));
+        var tran2 = getTranslation(node2.node.attr("transform"));
+
+        var diffs = {
+            right  : (tran2.x) - (tran1.x + dims1.width),
+            left   : (tran1.x) - (tran2.x + dims2.width),
+            top    : (tran1.y) - (tran2.y + dims2.height),
+            bottom : (tran2.y) - (tran1.y + dims1.height)
+        };
+
+        var x1, y1, x2, y2;
+        if (Math.max(diffs.right, diffs.left, diffs.top, diffs.bottom) === diffs.right) {
+            x1 = tran1.x + dims1.width;
+            y1 = tran1.y + dims1.height / 2;
+            x2 = tran2.x;
+            y2 = tran2.y + dims2.height / 2;
+        }
+        else if (Math.max(diffs.right, diffs.left, diffs.top, diffs.bottom) === diffs.left) {
+            x1 = tran1.x;
+            y1 = tran1.y + dims1.height / 2;
+            x2 = tran2.x + dims2.width;
+            y2 = tran2.y + dims1.height / 2;    
+        }
+        else if (Math.max(diffs.right, diffs.left, diffs.top, diffs.bottom) === diffs.top) {
+            x1 = tran1.x + dims1.width / 2;
+            y1 = tran1.y;
+            x2 = tran2.x + dims2.width / 2;
+            y2 = tran2.y + dims2.height;   
+        }
+        else {
+            x1 = tran1.x + dims1.width / 2;
+            y1 = tran1.y + dims1.height;
+            x2 = tran2.x + dims2.width / 2;
+            y2 = tran2.y;   
+        }
+
         this.conn = chart.append("g")
             .attr("class", "flowchart-connection");
 
@@ -139,11 +142,76 @@ var d3Flow = (function() {
             .style("text-anchor","middle")
             .style("dominant-baseline", "middle");
 
-        this.text = this.conn.insert("rect","text")
+        this.textBack = this.conn.insert("rect","text")
             .attr("transform", "translate(" + (x1 + (x2-x1)/2 - this.text.node().getBBox().width/2) + "," + (y1 + (y2-y1)/2 - this.text.node().getBBox().height/2) + ")")
             .attr("width", this.text.node().getBBox().width)
             .attr("height", this.text.node().getBBox().height)
             .style("fill", "white");
+
+        this.edges = function(edge1, edge2) {
+            
+            var dims1 = this.node1.node.node().getBBox();
+            var dims2 = this.node2.node.node().getBBox();
+
+            var tran1 = getTranslation(node1.node.attr("transform"));
+            var tran2 = getTranslation(node2.node.attr("transform"));
+
+            var x1, y1, x2, y2;
+            
+            if (edge1 === "right" || edge1 === "left") {
+                y1 = tran1.y + dims1.height / 2;
+                if (edge1 === "right") {
+                    x1 = tran1.x + dims1.width;
+                }
+                else if (edge1 === "left") {
+                    x1 = tran1.x;
+                }
+                else { throw "Invalid argument to Connection.edges"; }
+            }
+            else if (edge1 === "top" || edge1 === "bottom") {
+                x1 = tran1.x + dims1.width / 2;
+                if (edge1 === "top") {
+                    y1 = tran1.y;
+                }
+                else if (edge1 === "bottom") {
+                    y1 = tran1.y + dims1.height;
+                }
+                else { throw "Invalid argument to Connection.edges"; }
+            }
+
+            if (edge2 === "right" || edge2 === "left") {
+                y2 = tran2.y + dims2.height / 2;
+                if (edge2 === "right") {
+                    x2 = tran2.x + dims2.width;
+                }
+                else if (edge2 === "left") {
+                    x2 = tran2.x;
+                }
+                else { throw "Invalid argument to Connection.edges"; }
+            }
+            else if (edge2 === "top" || edge2 === "bottom") {
+                x2 = tran2.x + dims2.width / 2;
+                if (edge2 === "top") {
+                    y2 = tran2.y;
+                }
+                else if (edge2 === "bottom") {
+                    y2 = tran2.y + dims2.height;
+                }
+                else { throw "Invalid argument to Connection.edges"; }
+            }
+
+            this.line
+                .attr("x1", x1)
+                .attr("y1", y1)
+                .attr("x2", x2)
+                .attr("y2", y2);
+
+            this.text
+                .attr("transform", "translate(" + (x1 + (x2-x1)/2) + "," + (y1 + (y2-y1)/2) + ")");
+
+            this.textBack
+                .attr("transform", "translate(" + (x1 + (x2-x1)/2 - this.text.node().getBBox().width/2) + "," + (y1 + (y2-y1)/2 - this.text.node().getBBox().height/2) + ")"); 
+        };
 
     };
 
