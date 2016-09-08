@@ -151,10 +151,30 @@ var d3Flow = (function() {
             return this;
         };
 
-        this.type = function(type) {
+        this.dir = function(dir) {
 
-            console.log(this.edge1);
-            console.log(this.edge2);
+            this.direction = dir;
+
+            this.line.attr("marker-end", "none");
+            this.line.attr("marker-start", "none");
+
+            switch (dir) {
+                case "forward":
+                    this.line.attr("marker-end", "url(#arrowhead-end)");
+                    break;
+                case "backward":
+                    this.line.attr("marker-start", "url(#arrowhead-start)");
+                    break;
+                case "both":
+                    this.line.attr("marker-end", "url(#arrowhead-end)");
+                    this.line.attr("marker-start", "url(#arrowhead-start)");
+                    break;
+            }
+
+            return this;
+        };
+
+        this.type = function(type) {
 
             var buffer = 20;
 
@@ -353,7 +373,7 @@ var d3Flow = (function() {
             .attr("class", "flowchart-connection");
 
         this.conn.append("svg:defs").append("svg:marker")
-            .attr("id", "arrowhead")
+            .attr("id", "arrowhead-end")
             .attr("refX", 6)
             .attr("refY", 3)
             .attr("markerWidth", 30)
@@ -363,12 +383,22 @@ var d3Flow = (function() {
             .attr("d", "M 0 0 6 3 0 6 1 3")
             .style("fill", "black");
 
+        this.conn.append("svg:defs").append("svg:marker")
+            .attr("id", "arrowhead-start")
+            .attr("refX", 0)
+            .attr("refY", 3)
+            .attr("markerWidth", 30)
+            .attr("markerHeight", 30)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M 6 0 0 3 6 6 5 3")
+            .style("fill", "black");
+
         this.line = this.conn.append("path")
             .attr("class", "flowchart-conn-line")
             .attr("stroke-width", 2)
             .attr("stroke", "black")
-            .attr("fill", "none")
-            .attr("marker-end", "url(#arrowhead)");
+            .attr("fill", "none");
 
         this.text = this.conn.append("text")
             .attr("class", "flowchart-conn-text")
@@ -384,12 +414,9 @@ var d3Flow = (function() {
             .style("stroke-width", 10);
 
         this.edges(this.edge1, this.edge2);
+        this.dir("forward");
 
     };
-
-
-
-
 
     function getTranslation(transform) {
         var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -400,8 +427,6 @@ var d3Flow = (function() {
             y : matrix.f
         };
     }
-
-        
 
     return {
         flowChart : FlowChart
