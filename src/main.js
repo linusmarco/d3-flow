@@ -40,11 +40,21 @@ var d3Flow = (function() {
 
         this.shape = this.node.append(s)
             .attr("class", "flowchart-node-shape")
-            .attr("width", w)
-            .attr("height", h)
             .style("fill", "white")
             .style("stroke", "black")
             .style("stroke-width", 2);
+
+        if (s === "rect") {
+            this.shape
+                .attr("width", w)
+                .attr("height", h);
+        }
+        else if (s === "circle") {
+            this.shape
+                .attr("cx", w/2)
+                .attr("cy", w/2)
+                .attr("r", w/2);
+        }
         
         this.text = this.node.append("text")
             .attr("class", "flowchart-node-text")
