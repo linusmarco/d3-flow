@@ -33,11 +33,11 @@
             node7 = chart.addNode("rect", 200, 50, "Node 7")
                 .rel(node6, 0, 150);
 
-            node8 = chart.addNode("rect", 200, 50, "Node 8")
-                .rel(node7, 0, 300);
+            node8 = chart.addNode("circle", 100, 100, "Node 8")
+                .rel(node7, 50, 300);
 
             node9 = chart.addNode("rect", 200, 50, "Node 9")
-                .rel(node8, 150, 150);
+                .rel(node8, 100, 150);
 
             node10 = chart.addNode("rect", 200, 50, "Node 10")
                 .rel(node9, -150, 150);
@@ -105,7 +105,7 @@
                 .type("crooked");
 
             conn26 = chart.addConn(node2, node6, "Two-way connection")
-                .dir("both")
+                .dir("both");
 
         </script>
     </body>
