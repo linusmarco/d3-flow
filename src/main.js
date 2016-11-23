@@ -336,7 +336,7 @@ var d3Flow = (function() {
 
         this.color = function(color) {
             this.line.style("stroke", color);
-            this.conn.selectAll("path").style("fill", color);
+            this.conn.select("path").style("fill", color);
             return this;
         }
 
