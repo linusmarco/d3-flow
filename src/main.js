@@ -74,6 +74,16 @@ var d3Flow = (function() {
             this.node.attr("transform", "translate(" + (tran.x + dx) + "," + (tran.y + dy) + ")");
             return this;
         };
+
+        this.style = function(attr, val) {
+            this.shape.style(attr, val);
+            return this;
+        }
+
+        this.attr = function(attr, val) {
+            this.shape.attr(attr, val);
+            return this;
+        }
     };
 
     // connection class
@@ -323,6 +333,17 @@ var d3Flow = (function() {
 
             return this;
         };
+
+        this.color = function(color) {
+            this.line.style("stroke", color);
+            this.conn.select("path").style("fill", color);
+            return this;
+        }
+
+        this.weight = function(val) {
+            this.line.style("stroke-width", val);
+            return this;
+        }
 
 
         this.node1 = node1;
