@@ -336,7 +336,7 @@ var d3Flow = (function() {
 
         this.color = function(color) {
             this.line.style("stroke", color);
-            this.conn.select("path").style("fill", color);
+            this.conn.selectAll(".arrowhead path").style("fill", color);
             return this;
         }
 
@@ -405,6 +405,7 @@ var d3Flow = (function() {
 
         this.conn.append("svg:defs").append("svg:marker")
             .attr("id", "arrowhead-end")
+            .attr("class", "arrowhead")
             .attr("refX", 6)
             .attr("refY", 3)
             .attr("markerWidth", 30)
@@ -416,6 +417,7 @@ var d3Flow = (function() {
 
         this.conn.append("svg:defs").append("svg:marker")
             .attr("id", "arrowhead-start")
+            .attr("class", "arrowhead")
             .attr("refX", 0)
             .attr("refY", 3)
             .attr("markerWidth", 30)
