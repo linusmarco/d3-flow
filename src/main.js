@@ -89,6 +89,8 @@ var d3Flow = (function() {
     // connection class
     var Connection = function(chart, node1, node2, t) {
         
+        this.connId = Math.floor(Math.random()*1000000);
+
         this.getPts = function(edge1, edge2) {
 
             var dims1 = this.node1.node.node().getBBox();
@@ -180,14 +182,14 @@ var d3Flow = (function() {
 
             switch (dir) {
                 case "forward":
-                    this.line.attr("marker-end", "url(#arrowhead-end)");
+                    this.line.attr("marker-end", "url(#arrowhead-end-" + this.connId + ")");
                     break;
                 case "backward":
-                    this.line.attr("marker-start", "url(#arrowhead-start)");
+                    this.line.attr("marker-start", "url(#arrowhead-start-" + this.connId + ")");
                     break;
                 case "both":
-                    this.line.attr("marker-end", "url(#arrowhead-end)");
-                    this.line.attr("marker-start", "url(#arrowhead-start)");
+                    this.line.attr("marker-end", "url(#arrowhead-end-" + this.connId + ")");
+                    this.line.attr("marker-start", "url(#arrowhead-start-" + this.connId + ")");
                     break;
             }
 
@@ -335,8 +337,9 @@ var d3Flow = (function() {
         };
 
         this.color = function(color) {
-            this.line.style("stroke", color);
-            this.conn.selectAll(".arrowhead path").style("fill", color);
+            this.line.attr("stroke", color);
+            this.arrowStart.attr("fill", color);
+            this.arrowEnd.attr("fill", color);
             return this;
         }
 
@@ -403,8 +406,8 @@ var d3Flow = (function() {
         this.conn = chart.append("g")
             .attr("class", "flowchart-connection");
 
-        this.conn.append("svg:defs").append("svg:marker")
-            .attr("id", "arrowhead-end")
+        this.arrowEnd = this.conn.append("svg:defs").append("svg:marker")
+            .attr("id", "arrowhead-end-" + this.connId)
             .attr("class", "arrowhead")
             .attr("refX", 6)
             .attr("refY", 3)
@@ -413,10 +416,10 @@ var d3Flow = (function() {
             .attr("orient", "auto")
             .append("path")
             .attr("d", "M 0 0 6 3 0 6 1 3")
-            .style("fill", "black");
+            .attr("fill", "black");
 
-        this.conn.append("svg:defs").append("svg:marker")
-            .attr("id", "arrowhead-start")
+        this.arrowStart = this.conn.append("svg:defs").append("svg:marker")
+            .attr("id", "arrowhead-start-" + this.connId)
             .attr("class", "arrowhead")
             .attr("refX", 0)
             .attr("refY", 3)
@@ -425,7 +428,7 @@ var d3Flow = (function() {
             .attr("orient", "auto")
             .append("path")
             .attr("d", "M 6 0 0 3 6 6 5 3")
-            .style("fill", "black");
+            .attr("fill", "black");
 
         this.line = this.conn.append("path")
             .attr("class", "flowchart-conn-line")
